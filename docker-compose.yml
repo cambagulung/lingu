@@ -1,0 +1,39 @@
+version: '3.3'
+services:
+  db:
+    container_name: lingu-db
+    image: mysql:5.7
+    environment:
+      - MYSQL_ROOT_PASSWORD=supersecret_lingu
+      - MYSQL_USER=lingu
+      - MYSQL_PASSWORD=secret_lingu
+      - MYSQL_DATABASE=lastway
+    volumes:
+      - ./mysql:/var/lib/mysql
+    ports:
+        - 8301:3306
+    restart: 'always'
+  pma:
+    container_name: lingu-pma
+    image: phpmyadmin/phpmyadmin
+    ports:
+      - 8302:80
+    environment:
+      MYSQL_USER: lingu
+      MYSQL_PASSWORD: secret_lingu
+      MYSQL_ROOT_PASSWORD: supersecret_lingu
+    depends_on:
+      - db
+  web:
+    container_name: lingu-web
+    build: .
+    environment:
+      - MYSQL_USER=lingu
+      - MYSQL_PASSWORD=secret_lingu
+      - MYSQL_HOST=db
+      - MYSQL_DATABASE=lastway
+      - MYSQL_DATABASE_FRONT=lastway
+    ports:
+      - 8300:8080
+    depends_on:
+      - db
